@@ -5,6 +5,12 @@ open IslMemory
 open IslErrors
 open Unsigned
 
+let isl_union_map_find_dim_by_name = foreign "isl_union_map_find_dim_by_name" (Types.union_map @-> dim_type @-> string @-> returning int)
+let find_dim_by_name ctx umap typ name = 
+    let ret = isl_union_map_find_dim_by_name umap typ name in
+    check_for_errors ctx;
+    ret
+
 let isl_union_map_n_map = foreign "isl_union_map_n_map" (Types.union_map @-> returning int)
 let n_map ctx umap = 
     let ret = isl_union_map_n_map umap in
@@ -20,12 +26,6 @@ let dim ctx umap typ =
 let isl_union_map_dump = foreign "isl_union_map_dump" (Types.union_map @-> returning void)
 let dump ctx umap = 
     let ret = isl_union_map_dump umap in
-    check_for_errors ctx;
-    ret
-
-let isl_union_map_plain_is_injective = foreign "isl_union_map_plain_is_injective" (Types.union_map @-> returning bool)
-let plain_is_injective ctx umap = 
-    let ret = isl_union_map_plain_is_injective umap in
     check_for_errors ctx;
     ret
 
@@ -78,14 +78,6 @@ let align_params ctx umap model =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_compute_divs = foreign "isl_union_map_compute_divs" (Types.union_map @-> returning Types.union_map)
-let compute_divs ctx umap = 
-    let umap = union_map_copy umap in
-    let ret = isl_union_map_compute_divs umap in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
 let isl_union_map_curry = foreign "isl_union_map_curry" (Types.union_map @-> returning Types.union_map)
 let curry ctx umap = 
     let umap = union_map_copy umap in
@@ -102,27 +94,10 @@ let deltas_map ctx umap =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_domain_map = foreign "isl_union_map_domain_map" (Types.union_map @-> returning Types.union_map)
-let domain_map ctx umap = 
-    let umap = union_map_copy umap in
-    let ret = isl_union_map_domain_map umap in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
-let isl_union_map_domain_product = foreign "isl_union_map_domain_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
-let domain_product ctx umap1 umap2 = 
-    let umap1 = union_map_copy umap1 in
-    let umap2 = union_map_copy umap2 in
-    let ret = isl_union_map_domain_product umap1 umap2 in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
 let isl_union_map_empty = foreign "isl_union_map_empty" (Types.space @-> returning Types.union_map)
-let empty ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_union_map_empty dim in
+let empty ctx space = 
+    let space = space_copy space in
+    let ret = isl_union_map_empty space in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
@@ -136,6 +111,15 @@ let fixed_power_val ctx umap exp =
     Gc.finalise union_map_free ret;
     ret
 
+let isl_union_map_flat_domain_product = foreign "isl_union_map_flat_domain_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
+let flat_domain_product ctx umap1 umap2 = 
+    let umap1 = union_map_copy umap1 in
+    let umap2 = union_map_copy umap2 in
+    let ret = isl_union_map_flat_domain_product umap1 umap2 in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
 let isl_union_map_flat_range_product = foreign "isl_union_map_flat_range_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
 let flat_range_product ctx umap1 umap2 = 
     let umap1 = union_map_copy umap1 in
@@ -145,27 +129,11 @@ let flat_range_product ctx umap1 umap2 =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_from_domain = foreign "isl_union_map_from_domain" (Types.union_set @-> returning Types.union_map)
-let from_domain ctx uset = 
-    let uset = union_set_copy uset in
-    let ret = isl_union_map_from_domain uset in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
-let isl_union_map_from_domain_and_range = foreign "isl_union_map_from_domain_and_range" (Types.union_set @-> Types.union_set @-> returning Types.union_map)
-let from_domain_and_range ctx domain range = 
-    let domain = union_set_copy domain in
-    let range = union_set_copy range in
-    let ret = isl_union_map_from_domain_and_range domain range in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
-let isl_union_map_from_range = foreign "isl_union_map_from_range" (Types.union_set @-> returning Types.union_map)
-let from_range ctx uset = 
-    let uset = union_set_copy uset in
-    let ret = isl_union_map_from_range uset in
+let isl_union_map_intersect_range_factor_range = foreign "isl_union_map_intersect_range_factor_range" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
+let intersect_range_factor_range ctx umap factor = 
+    let umap = union_map_copy umap in
+    let factor = union_map_copy factor in
+    let ret = isl_union_map_intersect_range_factor_range umap factor in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
@@ -206,15 +174,6 @@ let lex_lt_union_map ctx umap1 umap2 =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_product = foreign "isl_union_map_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
-let product ctx umap1 umap2 = 
-    let umap1 = union_map_copy umap1 in
-    let umap2 = union_map_copy umap2 in
-    let ret = isl_union_map_product umap1 umap2 in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
 let isl_union_map_project_out = foreign "isl_union_map_project_out" (Types.union_map @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.union_map)
 let project_out ctx umap typ first n = 
     let umap = union_map_copy umap in
@@ -223,19 +182,26 @@ let project_out ctx umap typ first n =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_range_map = foreign "isl_union_map_range_map" (Types.union_map @-> returning Types.union_map)
-let range_map ctx umap = 
+let isl_union_map_range_curry = foreign "isl_union_map_range_curry" (Types.union_map @-> returning Types.union_map)
+let range_curry ctx umap = 
     let umap = union_map_copy umap in
-    let ret = isl_union_map_range_map umap in
+    let ret = isl_union_map_range_curry umap in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_range_product = foreign "isl_union_map_range_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
-let range_product ctx umap1 umap2 = 
-    let umap1 = union_map_copy umap1 in
-    let umap2 = union_map_copy umap2 in
-    let ret = isl_union_map_range_product umap1 umap2 in
+let isl_union_map_remove_divs = foreign "isl_union_map_remove_divs" (Types.union_map @-> returning Types.union_map)
+let remove_divs ctx bmap = 
+    let bmap = union_map_copy bmap in
+    let ret = isl_union_map_remove_divs bmap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_remove_redundancies = foreign "isl_union_map_remove_redundancies" (Types.union_map @-> returning Types.union_map)
+let remove_redundancies ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_remove_redundancies umap in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
@@ -272,38 +238,6 @@ let universe ctx umap =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_map_zip = foreign "isl_union_map_zip" (Types.union_map @-> returning Types.union_map)
-let zip ctx umap = 
-    let umap = union_map_copy umap in
-    let ret = isl_union_map_zip umap in
-    check_for_errors ctx;
-    Gc.finalise union_map_free ret;
-    ret
-
-let isl_union_map_domain = foreign "isl_union_map_domain" (Types.union_map @-> returning Types.union_set)
-let domain ctx umap = 
-    let umap = union_map_copy umap in
-    let ret = isl_union_map_domain umap in
-    check_for_errors ctx;
-    Gc.finalise union_set_free ret;
-    ret
-
-let isl_union_map_range = foreign "isl_union_map_range" (Types.union_map @-> returning Types.union_set)
-let range ctx umap = 
-    let umap = union_map_copy umap in
-    let ret = isl_union_map_range umap in
-    check_for_errors ctx;
-    Gc.finalise union_set_free ret;
-    ret
-
-let isl_union_map_wrap = foreign "isl_union_map_wrap" (Types.union_map @-> returning Types.union_set)
-let wrap ctx umap = 
-    let umap = union_map_copy umap in
-    let ret = isl_union_map_wrap umap in
-    check_for_errors ctx;
-    Gc.finalise union_set_free ret;
-    ret
-
 let isl_union_map_get_dim_id = foreign "isl_union_map_get_dim_id" (Types.union_map @-> dim_type @-> unsigned_int @-> returning Types.id)
 let get_dim_id ctx umap typ pos = 
     let ret = isl_union_map_get_dim_id umap typ pos in
@@ -311,46 +245,11 @@ let get_dim_id ctx umap typ pos =
     Gc.finalise id_free ret;
     ret
 
-let isl_union_map_is_bijective = foreign "isl_union_map_is_bijective" (Types.union_map @-> returning bool)
-let is_bijective ctx umap = 
-    let ret = isl_union_map_is_bijective umap in
+let isl_union_map_to_str = foreign "isl_union_map_to_str" (Types.union_map @-> returning string)
+let to_string ctx umap = 
+    let ret = isl_union_map_to_str umap in
     check_for_errors ctx;
-    ret
-
-let isl_union_map_is_empty = foreign "isl_union_map_is_empty" (Types.union_map @-> returning bool)
-let is_empty ctx umap = 
-    let ret = isl_union_map_is_empty umap in
-    check_for_errors ctx;
-    ret
-
-let isl_union_map_is_equal = foreign "isl_union_map_is_equal" (Types.union_map @-> Types.union_map @-> returning bool)
-let is_equal ctx umap1 umap2 = 
-    let ret = isl_union_map_is_equal umap1 umap2 in
-    check_for_errors ctx;
-    ret
-
-let isl_union_map_is_injective = foreign "isl_union_map_is_injective" (Types.union_map @-> returning bool)
-let is_injective ctx umap = 
-    let ret = isl_union_map_is_injective umap in
-    check_for_errors ctx;
-    ret
-
-let isl_union_map_is_single_valued = foreign "isl_union_map_is_single_valued" (Types.union_map @-> returning bool)
-let is_single_valued ctx umap = 
-    let ret = isl_union_map_is_single_valued umap in
-    check_for_errors ctx;
-    ret
-
-let isl_union_map_is_strict_subset = foreign "isl_union_map_is_strict_subset" (Types.union_map @-> Types.union_map @-> returning bool)
-let is_strict_subset ctx umap1 umap2 = 
-    let ret = isl_union_map_is_strict_subset umap1 umap2 in
-    check_for_errors ctx;
-    ret
-
-let isl_union_map_is_subset = foreign "isl_union_map_is_subset" (Types.union_map @-> Types.union_map @-> returning bool)
-let is_subset ctx umap1 umap2 = 
-    let ret = isl_union_map_is_subset umap1 umap2 in
-    check_for_errors ctx;
+    Gc.finalise (fun _ -> ()) ret;
     ret
 
 let isl_union_map_affine_hull = foreign "isl_union_map_affine_hull" (Types.union_map @-> returning Types.union_map)
@@ -387,10 +286,92 @@ let coalesce ctx umap =
     Gc.finalise union_map_free ret;
     ret
 
+let isl_union_map_compute_divs = foreign "isl_union_map_compute_divs" (Types.union_map @-> returning Types.union_map)
+let compute_divs ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_compute_divs umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
 let isl_union_map_detect_equalities = foreign "isl_union_map_detect_equalities" (Types.union_map @-> returning Types.union_map)
 let detect_equalities ctx umap = 
     let umap = union_map_copy umap in
     let ret = isl_union_map_detect_equalities umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_domain_factor_domain = foreign "isl_union_map_domain_factor_domain" (Types.union_map @-> returning Types.union_map)
+let domain_factor_domain ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_domain_factor_domain umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_domain_factor_range = foreign "isl_union_map_domain_factor_range" (Types.union_map @-> returning Types.union_map)
+let domain_factor_range ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_domain_factor_range umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_domain_map = foreign "isl_union_map_domain_map" (Types.union_map @-> returning Types.union_map)
+let domain_map ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_domain_map umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_domain_product = foreign "isl_union_map_domain_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
+let domain_product ctx umap1 umap2 = 
+    let umap1 = union_map_copy umap1 in
+    let umap2 = union_map_copy umap2 in
+    let ret = isl_union_map_domain_product umap1 umap2 in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_factor_domain = foreign "isl_union_map_factor_domain" (Types.union_map @-> returning Types.union_map)
+let factor_domain ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_factor_domain umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_factor_range = foreign "isl_union_map_factor_range" (Types.union_map @-> returning Types.union_map)
+let factor_range ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_factor_range umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_from_domain = foreign "isl_union_map_from_domain" (Types.union_set @-> returning Types.union_map)
+let from_domain ctx uset = 
+    let uset = union_set_copy uset in
+    let ret = isl_union_map_from_domain uset in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_from_domain_and_range = foreign "isl_union_map_from_domain_and_range" (Types.union_set @-> Types.union_set @-> returning Types.union_map)
+let from_domain_and_range ctx domain range = 
+    let domain = union_set_copy domain in
+    let range = union_set_copy range in
+    let ret = isl_union_map_from_domain_and_range domain range in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_from_range = foreign "isl_union_map_from_range" (Types.union_set @-> returning Types.union_map)
+let from_range ctx uset = 
+    let uset = union_set_copy uset in
+    let ret = isl_union_map_from_range uset in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
@@ -491,6 +472,56 @@ let polyhedral_hull ctx umap =
     Gc.finalise union_map_free ret;
     ret
 
+let isl_union_map_product = foreign "isl_union_map_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
+let product ctx umap1 umap2 = 
+    let umap1 = union_map_copy umap1 in
+    let umap2 = union_map_copy umap2 in
+    let ret = isl_union_map_product umap1 umap2 in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_project_out_all_params = foreign "isl_union_map_project_out_all_params" (Types.union_map @-> returning Types.union_map)
+let project_out_all_params ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_project_out_all_params umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_range_factor_domain = foreign "isl_union_map_range_factor_domain" (Types.union_map @-> returning Types.union_map)
+let range_factor_domain ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_range_factor_domain umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_range_factor_range = foreign "isl_union_map_range_factor_range" (Types.union_map @-> returning Types.union_map)
+let range_factor_range ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_range_factor_range umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_range_map = foreign "isl_union_map_range_map" (Types.union_map @-> returning Types.union_map)
+let range_map ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_range_map umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_map_range_product = foreign "isl_union_map_range_product" (Types.union_map @-> Types.union_map @-> returning Types.union_map)
+let range_product ctx umap1 umap2 = 
+    let umap1 = union_map_copy umap1 in
+    let umap2 = union_map_copy umap2 in
+    let ret = isl_union_map_range_product umap1 umap2 in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
 let isl_union_map_reverse = foreign "isl_union_map_reverse" (Types.union_map @-> returning Types.union_map)
 let reverse ctx umap = 
     let umap = union_map_copy umap in
@@ -535,10 +566,42 @@ let union ctx umap1 umap2 =
     Gc.finalise union_map_free ret;
     ret
 
+let isl_union_map_zip = foreign "isl_union_map_zip" (Types.union_map @-> returning Types.union_map)
+let zip ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_zip umap in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
 let isl_union_map_deltas = foreign "isl_union_map_deltas" (Types.union_map @-> returning Types.union_set)
 let deltas ctx umap = 
     let umap = union_map_copy umap in
     let ret = isl_union_map_deltas umap in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_map_domain = foreign "isl_union_map_domain" (Types.union_map @-> returning Types.union_set)
+let domain ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_domain umap in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_map_range = foreign "isl_union_map_range" (Types.union_map @-> returning Types.union_set)
+let range ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_range umap in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_map_wrap = foreign "isl_union_map_wrap" (Types.union_map @-> returning Types.union_set)
+let wrap ctx umap = 
+    let umap = union_map_copy umap in
+    let ret = isl_union_map_wrap umap in
     check_for_errors ctx;
     Gc.finalise union_set_free ret;
     ret

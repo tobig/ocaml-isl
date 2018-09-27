@@ -14,13 +14,6 @@ Library "isl_core"
   FindlibName:	core
   Modules:	IslMemory, IslErrors, Types, IslCtx, IslAff_Core, IslBasicMap_Core, IslBasicSet_Core, IslConstraint_Core, IslId_Core, IslLocalSpace_Core, IslMap_Core, IslSet_Core, IslUnionMap_Core, IslUnionSet_Core, IslValue_Core
 
-# Library "isl"
-#   Path:		src/isl
-#   BuildTools:	ocamlbuild
-#   BuildDepends:	isl.core
-#   FindlibName:	isl
-#   Modules:	Main
-
 Library "isl"
   Path:            src/
   BuildTools:      ocamlbuild

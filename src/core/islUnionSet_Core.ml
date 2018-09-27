@@ -11,15 +11,15 @@ let n_set ctx uset =
     check_for_errors ctx;
     ret
 
-let isl_union_set_dump = foreign "isl_union_set_dump" (Types.union_set @-> returning void)
-let dump ctx uset = 
-    let ret = isl_union_set_dump uset in
+let isl_union_set_dim = foreign "isl_union_set_dim" (Types.union_set @-> dim_type @-> returning unsigned_int)
+let dim ctx uset typ = 
+    let ret = isl_union_set_dim uset typ in
     check_for_errors ctx;
     ret
 
-let isl_union_set_is_params = foreign "isl_union_set_is_params" (Types.union_set @-> returning bool)
-let is_params ctx uset = 
-    let ret = isl_union_set_is_params uset in
+let isl_union_set_dump = foreign "isl_union_set_dump" (Types.union_set @-> returning void)
+let dump ctx uset = 
+    let ret = isl_union_set_dump uset in
     check_for_errors ctx;
     ret
 
@@ -82,10 +82,10 @@ let lex_lt_union_set ctx uset1 uset2 =
     Gc.finalise union_map_free ret;
     ret
 
-let isl_union_set_unwrap = foreign "isl_union_set_unwrap" (Types.union_set @-> returning Types.union_map)
-let unwrap ctx uset = 
+let isl_union_set_wrapped_domain_map = foreign "isl_union_set_wrapped_domain_map" (Types.union_set @-> returning Types.union_map)
+let wrapped_domain_map ctx uset = 
     let uset = union_set_copy uset in
-    let ret = isl_union_set_unwrap uset in
+    let ret = isl_union_set_wrapped_domain_map uset in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
@@ -124,18 +124,10 @@ let coefficients ctx bset =
     Gc.finalise union_set_free ret;
     ret
 
-let isl_union_set_compute_divs = foreign "isl_union_set_compute_divs" (Types.union_set @-> returning Types.union_set)
-let compute_divs ctx uset = 
-    let uset = union_set_copy uset in
-    let ret = isl_union_set_compute_divs uset in
-    check_for_errors ctx;
-    Gc.finalise union_set_free ret;
-    ret
-
 let isl_union_set_empty = foreign "isl_union_set_empty" (Types.space @-> returning Types.union_set)
-let empty ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_union_set_empty dim in
+let empty ctx space = 
+    let space = space_copy space in
+    let ret = isl_union_set_empty space in
     check_for_errors ctx;
     Gc.finalise union_set_free ret;
     ret
@@ -153,6 +145,30 @@ let product ctx uset1 uset2 =
     let uset1 = union_set_copy uset1 in
     let uset2 = union_set_copy uset2 in
     let ret = isl_union_set_product uset1 uset2 in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_set_project_out = foreign "isl_union_set_project_out" (Types.union_set @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.union_set)
+let project_out ctx uset typ first n = 
+    let uset = union_set_copy uset in
+    let ret = isl_union_set_project_out uset typ first n in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_set_remove_divs = foreign "isl_union_set_remove_divs" (Types.union_set @-> returning Types.union_set)
+let remove_divs ctx bset = 
+    let bset = union_set_copy bset in
+    let ret = isl_union_set_remove_divs bset in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_set_remove_redundancies = foreign "isl_union_set_remove_redundancies" (Types.union_set @-> returning Types.union_set)
+let remove_redundancies ctx uset = 
+    let uset = union_set_copy uset in
+    let ret = isl_union_set_remove_redundancies uset in
     check_for_errors ctx;
     Gc.finalise union_set_free ret;
     ret
@@ -181,15 +197,6 @@ let solutions ctx bset =
     Gc.finalise union_set_free ret;
     ret
 
-let isl_union_set_union = foreign "isl_union_set_union" (Types.union_set @-> Types.union_set @-> returning Types.union_set)
-let union ctx uset1 uset2 = 
-    let uset1 = union_set_copy uset1 in
-    let uset2 = union_set_copy uset2 in
-    let ret = isl_union_set_union uset1 uset2 in
-    check_for_errors ctx;
-    Gc.finalise union_set_free ret;
-    ret
-
 let isl_union_set_universe = foreign "isl_union_set_universe" (Types.union_set @-> returning Types.union_set)
 let universe ctx uset = 
     let uset = union_set_copy uset in
@@ -198,34 +205,25 @@ let universe ctx uset =
     Gc.finalise union_set_free ret;
     ret
 
-let isl_union_set_is_empty = foreign "isl_union_set_is_empty" (Types.union_set @-> returning bool)
-let is_empty ctx uset = 
-    let ret = isl_union_set_is_empty uset in
+let isl_union_set_to_str = foreign "isl_union_set_to_str" (Types.union_set @-> returning string)
+let to_string ctx uset = 
+    let ret = isl_union_set_to_str uset in
     check_for_errors ctx;
-    ret
-
-let isl_union_set_is_equal = foreign "isl_union_set_is_equal" (Types.union_set @-> Types.union_set @-> returning bool)
-let is_equal ctx uset1 uset2 = 
-    let ret = isl_union_set_is_equal uset1 uset2 in
-    check_for_errors ctx;
-    ret
-
-let isl_union_set_is_strict_subset = foreign "isl_union_set_is_strict_subset" (Types.union_set @-> Types.union_set @-> returning bool)
-let is_strict_subset ctx uset1 uset2 = 
-    let ret = isl_union_set_is_strict_subset uset1 uset2 in
-    check_for_errors ctx;
-    ret
-
-let isl_union_set_is_subset = foreign "isl_union_set_is_subset" (Types.union_set @-> Types.union_set @-> returning bool)
-let is_subset ctx uset1 uset2 = 
-    let ret = isl_union_set_is_subset uset1 uset2 in
-    check_for_errors ctx;
+    Gc.finalise (fun _ -> ()) ret;
     ret
 
 let isl_union_set_identity = foreign "isl_union_set_identity" (Types.union_set @-> returning Types.union_map)
 let identity ctx uset = 
     let uset = union_set_copy uset in
     let ret = isl_union_set_identity uset in
+    check_for_errors ctx;
+    Gc.finalise union_map_free ret;
+    ret
+
+let isl_union_set_unwrap = foreign "isl_union_set_unwrap" (Types.union_set @-> returning Types.union_map)
+let unwrap ctx uset = 
+    let uset = union_set_copy uset in
+    let ret = isl_union_set_unwrap uset in
     check_for_errors ctx;
     Gc.finalise union_map_free ret;
     ret
@@ -251,6 +249,14 @@ let isl_union_set_coalesce = foreign "isl_union_set_coalesce" (Types.union_set @
 let coalesce ctx uset = 
     let uset = union_set_copy uset in
     let ret = isl_union_set_coalesce uset in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_set_compute_divs = foreign "isl_union_set_compute_divs" (Types.union_set @-> returning Types.union_set)
+let compute_divs ctx uset = 
+    let uset = union_set_copy uset in
+    let ret = isl_union_set_compute_divs uset in
     check_for_errors ctx;
     Gc.finalise union_set_free ret;
     ret
@@ -328,6 +334,15 @@ let subtract ctx uset1 uset2 =
     let uset1 = union_set_copy uset1 in
     let uset2 = union_set_copy uset2 in
     let ret = isl_union_set_subtract uset1 uset2 in
+    check_for_errors ctx;
+    Gc.finalise union_set_free ret;
+    ret
+
+let isl_union_set_union = foreign "isl_union_set_union" (Types.union_set @-> Types.union_set @-> returning Types.union_set)
+let union ctx uset1 uset2 = 
+    let uset1 = union_set_copy uset1 in
+    let uset2 = union_set_copy uset2 in
+    let ret = isl_union_set_union uset1 uset2 in
     check_for_errors ctx;
     Gc.finalise union_set_free ret;
     ret

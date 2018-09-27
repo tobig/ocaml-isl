@@ -4,12 +4,9 @@ module Make (Ctx: IslCtx.SIG): IslLocalSpace_sigs.S with module Types := Types =
     module Types = Types
 
     let dim = dim Ctx.ctx
+    let find_dim_by_name = find_dim_by_name Ctx.ctx
     let dump = dump Ctx.ctx
     let get_dim_name = get_dim_name Ctx.ctx
-    let has_dim_id = has_dim_id Ctx.ctx
-    let has_dim_name = has_dim_name Ctx.ctx
-    let is_equal = is_equal Ctx.ctx
-    let is_set = is_set Ctx.ctx
     let get_space = get_space Ctx.ctx
     let lifting = lifting Ctx.ctx
     let get_div = get_div Ctx.ctx
@@ -26,5 +23,7 @@ module Make (Ctx: IslCtx.SIG): IslLocalSpace_sigs.S with module Types := Types =
     let range = range Ctx.ctx
     let set_dim_id = set_dim_id Ctx.ctx
     let set_dim_name = set_dim_name Ctx.ctx
+    let set_from_params = set_from_params Ctx.ctx
     let set_tuple_id = set_tuple_id Ctx.ctx
+    let wrap = wrap Ctx.ctx
 end

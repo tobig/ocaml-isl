@@ -29,130 +29,19 @@ let dump ctx dim =
     check_for_errors ctx;
     ret
 
-let isl_space_get_tuple_name = foreign "isl_space_get_tuple_name" (Types.space @-> dim_type @-> returning string)
-let get_tuple_name ctx dim typ = 
-    let ret = isl_space_get_tuple_name dim typ in
-    check_for_errors ctx;
-    ret
-
-let isl_space_can_curry = foreign "isl_space_can_curry" (Types.space @-> returning bool)
-let can_curry ctx space = 
-    let ret = isl_space_can_curry space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_can_uncurry = foreign "isl_space_can_uncurry" (Types.space @-> returning bool)
-let can_uncurry ctx space = 
-    let ret = isl_space_can_uncurry space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_can_zip = foreign "isl_space_can_zip" (Types.space @-> returning bool)
-let can_zip ctx dim = 
-    let ret = isl_space_can_zip dim in
-    check_for_errors ctx;
-    ret
-
-let isl_space_compatible = foreign "isl_space_compatible" (Types.space @-> Types.space @-> returning bool)
-let compatible ctx dim1 dim2 = 
-    let ret = isl_space_compatible dim1 dim2 in
-    check_for_errors ctx;
-    ret
-
-let isl_space_domain_is_wrapping = foreign "isl_space_domain_is_wrapping" (Types.space @-> returning bool)
-let domain_is_wrapping ctx space = 
-    let ret = isl_space_domain_is_wrapping space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_has_dim_id = foreign "isl_space_has_dim_id" (Types.space @-> dim_type @-> unsigned_int @-> returning bool)
-let has_dim_id ctx dim typ pos = 
-    let ret = isl_space_has_dim_id dim typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_space_has_dim_name = foreign "isl_space_has_dim_name" (Types.space @-> dim_type @-> unsigned_int @-> returning bool)
-let has_dim_name ctx space typ pos = 
-    let ret = isl_space_has_dim_name space typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_space_has_tuple_id = foreign "isl_space_has_tuple_id" (Types.space @-> dim_type @-> returning bool)
-let has_tuple_id ctx dim typ = 
-    let ret = isl_space_has_tuple_id dim typ in
-    check_for_errors ctx;
-    ret
-
-let isl_space_has_tuple_name = foreign "isl_space_has_tuple_name" (Types.space @-> dim_type @-> returning bool)
-let has_tuple_name ctx space typ = 
-    let ret = isl_space_has_tuple_name space typ in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_domain = foreign "isl_space_is_domain" (Types.space @-> Types.space @-> returning bool)
-let is_domain ctx space1 space2 = 
-    let ret = isl_space_is_domain space1 space2 in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_equal = foreign "isl_space_is_equal" (Types.space @-> Types.space @-> returning bool)
-let is_equal ctx space1 space2 = 
-    let ret = isl_space_is_equal space1 space2 in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_map = foreign "isl_space_is_map" (Types.space @-> returning bool)
-let is_map ctx space = 
-    let ret = isl_space_is_map space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_params = foreign "isl_space_is_params" (Types.space @-> returning bool)
-let is_params ctx space = 
-    let ret = isl_space_is_params space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_range = foreign "isl_space_is_range" (Types.space @-> Types.space @-> returning bool)
-let is_range ctx space1 space2 = 
-    let ret = isl_space_is_range space1 space2 in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_set = foreign "isl_space_is_set" (Types.space @-> returning bool)
-let is_set ctx space = 
-    let ret = isl_space_is_set space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_is_wrapping = foreign "isl_space_is_wrapping" (Types.space @-> returning bool)
-let is_wrapping ctx dim = 
-    let ret = isl_space_is_wrapping dim in
-    check_for_errors ctx;
-    ret
-
-let isl_space_match = foreign "isl_space_match" (Types.space @-> dim_type @-> Types.space @-> dim_type @-> returning bool)
-let match_ ctx dim1 dim1_type dim2 dim2_type = 
-    let ret = isl_space_match dim1 dim1_type dim2 dim2_type in
-    check_for_errors ctx;
-    ret
-
-let isl_space_range_is_wrapping = foreign "isl_space_range_is_wrapping" (Types.space @-> returning bool)
-let range_is_wrapping ctx space = 
-    let ret = isl_space_range_is_wrapping space in
-    check_for_errors ctx;
-    ret
-
-let isl_space_tuple_match = foreign "isl_space_tuple_match" (Types.space @-> dim_type @-> Types.space @-> dim_type @-> returning bool)
-let tuple_match ctx dim1 dim1_type dim2 dim2_type = 
-    let ret = isl_space_tuple_match dim1 dim1_type dim2 dim2_type in
-    check_for_errors ctx;
-    ret
-
 let isl_space_add_dims = foreign "isl_space_add_dims" (Types.space @-> dim_type @-> unsigned_int @-> returning Types.space)
-let add_dims ctx dim typ n = 
-    let dim = space_copy dim in
-    let ret = isl_space_add_dims dim typ n in
+let add_dims ctx space typ n = 
+    let space = space_copy space in
+    let ret = isl_space_add_dims space typ n in
+    check_for_errors ctx;
+    Gc.finalise space_free ret;
+    ret
+
+let isl_space_add_param_id = foreign "isl_space_add_param_id" (Types.space @-> Types.id @-> returning Types.space)
+let add_param_id ctx space id = 
+    let space = space_copy space in
+    let id = id_copy id in
+    let ret = isl_space_add_param_id space id in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -182,9 +71,9 @@ let curry ctx space =
     ret
 
 let isl_space_domain = foreign "isl_space_domain" (Types.space @-> returning Types.space)
-let domain ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_space_domain dim in
+let domain ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_domain space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -193,6 +82,14 @@ let isl_space_domain_factor_domain = foreign "isl_space_domain_factor_domain" (T
 let domain_factor_domain ctx space = 
     let space = space_copy space in
     let ret = isl_space_domain_factor_domain space in
+    check_for_errors ctx;
+    Gc.finalise space_free ret;
+    ret
+
+let isl_space_domain_factor_range = foreign "isl_space_domain_factor_range" (Types.space @-> returning Types.space)
+let domain_factor_range ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_domain_factor_range space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -222,26 +119,34 @@ let drop_dims ctx dim typ first num =
     Gc.finalise space_free ret;
     ret
 
-let isl_space_drop_inputs = foreign "isl_space_drop_inputs" (Types.space @-> unsigned_int @-> unsigned_int @-> returning Types.space)
-let drop_inputs ctx dim first n = 
-    let dim = space_copy dim in
-    let ret = isl_space_drop_inputs dim first n in
+let isl_space_factor_domain = foreign "isl_space_factor_domain" (Types.space @-> returning Types.space)
+let factor_domain ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_factor_domain space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
 
-let isl_space_drop_outputs = foreign "isl_space_drop_outputs" (Types.space @-> unsigned_int @-> unsigned_int @-> returning Types.space)
-let drop_outputs ctx dim first n = 
-    let dim = space_copy dim in
-    let ret = isl_space_drop_outputs dim first n in
+let isl_space_factor_range = foreign "isl_space_factor_range" (Types.space @-> returning Types.space)
+let factor_range ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_factor_range space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
 
-let isl_space_extend = foreign "isl_space_extend" (Types.space @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> returning Types.space)
-let extend ctx dim nparam n_in n_out = 
-    let dim = space_copy dim in
-    let ret = isl_space_extend dim nparam n_in n_out in
+let isl_space_flatten_domain = foreign "isl_space_flatten_domain" (Types.space @-> returning Types.space)
+let flatten_domain ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_flatten_domain space in
+    check_for_errors ctx;
+    Gc.finalise space_free ret;
+    ret
+
+let isl_space_flatten_range = foreign "isl_space_flatten_range" (Types.space @-> returning Types.space)
+let flatten_range ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_flatten_range space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -263,9 +168,9 @@ let from_range ctx dim =
     ret
 
 let isl_space_insert_dims = foreign "isl_space_insert_dims" (Types.space @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.space)
-let insert_dims ctx dim typ pos n = 
-    let dim = space_copy dim in
-    let ret = isl_space_insert_dims dim typ pos n in
+let insert_dims ctx space typ pos n = 
+    let space = space_copy space in
+    let ret = isl_space_insert_dims space typ pos n in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -289,17 +194,17 @@ let map_from_domain_and_range ctx domain range =
     ret
 
 let isl_space_map_from_set = foreign "isl_space_map_from_set" (Types.space @-> returning Types.space)
-let map_from_set ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_space_map_from_set dim in
+let map_from_set ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_map_from_set space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
 
 let isl_space_move_dims = foreign "isl_space_move_dims" (Types.space @-> dim_type @-> unsigned_int @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.space)
-let move_dims ctx dim dst_type dst_pos src_type src_pos n = 
-    let dim = space_copy dim in
-    let ret = isl_space_move_dims dim dst_type dst_pos src_type src_pos n in
+let move_dims ctx space dst_type dst_pos src_type src_pos n = 
+    let space = space_copy space in
+    let ret = isl_space_move_dims space dst_type dst_pos src_type src_pos n in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -329,9 +234,17 @@ let product ctx left right =
     ret
 
 let isl_space_range = foreign "isl_space_range" (Types.space @-> returning Types.space)
-let range ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_space_range dim in
+let range ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_range space in
+    check_for_errors ctx;
+    Gc.finalise space_free ret;
+    ret
+
+let isl_space_range_curry = foreign "isl_space_range_curry" (Types.space @-> returning Types.space)
+let range_curry ctx space = 
+    let space = space_copy space in
+    let ret = isl_space_range_curry space in
     check_for_errors ctx;
     Gc.finalise space_free ret;
     ret
@@ -488,9 +401,22 @@ let get_tuple_id ctx dim typ =
     Gc.finalise id_free ret;
     ret
 
+let isl_space_to_str = foreign "isl_space_to_str" (Types.space @-> returning string)
+let to_string ctx space = 
+    let ret = isl_space_to_str space in
+    check_for_errors ctx;
+    Gc.finalise (fun _ -> ()) ret;
+    ret
+
 let isl_space_get_dim_name = foreign "isl_space_get_dim_name" (Types.space @-> dim_type @-> unsigned_int @-> returning string)
 let get_dim_name ctx dim typ pos = 
     let ret = isl_space_get_dim_name dim typ pos in
+    check_for_errors ctx;
+    ret
+
+let isl_space_get_tuple_name = foreign "isl_space_get_tuple_name" (Types.space @-> dim_type @-> returning string)
+let get_tuple_name ctx dim typ = 
+    let ret = isl_space_get_tuple_name dim typ in
     check_for_errors ctx;
     ret
 

@@ -11,6 +11,12 @@ let dim ctx ls typ =
     check_for_errors ctx;
     ret
 
+let isl_local_space_find_dim_by_name = foreign "isl_local_space_find_dim_by_name" (Types.local_space @-> dim_type @-> string @-> returning int)
+let find_dim_by_name ctx ls typ name = 
+    let ret = isl_local_space_find_dim_by_name ls typ name in
+    check_for_errors ctx;
+    ret
+
 let isl_local_space_dump = foreign "isl_local_space_dump" (Types.local_space @-> returning void)
 let dump ctx ls = 
     let ret = isl_local_space_dump ls in
@@ -20,30 +26,6 @@ let dump ctx ls =
 let isl_local_space_get_dim_name = foreign "isl_local_space_get_dim_name" (Types.local_space @-> dim_type @-> unsigned_int @-> returning string)
 let get_dim_name ctx ls typ pos = 
     let ret = isl_local_space_get_dim_name ls typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_local_space_has_dim_id = foreign "isl_local_space_has_dim_id" (Types.local_space @-> dim_type @-> unsigned_int @-> returning bool)
-let has_dim_id ctx ls typ pos = 
-    let ret = isl_local_space_has_dim_id ls typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_local_space_has_dim_name = foreign "isl_local_space_has_dim_name" (Types.local_space @-> dim_type @-> unsigned_int @-> returning bool)
-let has_dim_name ctx ls typ pos = 
-    let ret = isl_local_space_has_dim_name ls typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_local_space_is_equal = foreign "isl_local_space_is_equal" (Types.local_space @-> Types.local_space @-> returning bool)
-let is_equal ctx ls1 ls2 = 
-    let ret = isl_local_space_is_equal ls1 ls2 in
-    check_for_errors ctx;
-    ret
-
-let isl_local_space_is_set = foreign "isl_local_space_is_set" (Types.local_space @-> returning bool)
-let is_set ctx ls = 
-    let ret = isl_local_space_is_set ls in
     check_for_errors ctx;
     ret
 
@@ -174,11 +156,27 @@ let set_dim_name ctx ls typ pos s =
     Gc.finalise local_space_free ret;
     ret
 
+let isl_local_space_set_from_params = foreign "isl_local_space_set_from_params" (Types.local_space @-> returning Types.local_space)
+let set_from_params ctx ls = 
+    let ls = local_space_copy ls in
+    let ret = isl_local_space_set_from_params ls in
+    check_for_errors ctx;
+    Gc.finalise local_space_free ret;
+    ret
+
 let isl_local_space_set_tuple_id = foreign "isl_local_space_set_tuple_id" (Types.local_space @-> dim_type @-> Types.id @-> returning Types.local_space)
 let set_tuple_id ctx ls typ id = 
     let ls = local_space_copy ls in
     let id = id_copy id in
     let ret = isl_local_space_set_tuple_id ls typ id in
+    check_for_errors ctx;
+    Gc.finalise local_space_free ret;
+    ret
+
+let isl_local_space_wrap = foreign "isl_local_space_wrap" (Types.local_space @-> returning Types.local_space)
+let wrap ctx ls = 
+    let ls = local_space_copy ls in
+    let ret = isl_local_space_wrap ls in
     check_for_errors ctx;
     Gc.finalise local_space_free ret;
     ret

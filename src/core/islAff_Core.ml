@@ -5,15 +5,21 @@ open IslMemory
 open IslErrors
 open Unsigned
 
+let isl_aff_coefficient_sgn = foreign "isl_aff_coefficient_sgn" (Types.aff @-> dim_type @-> int @-> returning int)
+let coefficient_sgn ctx aff typ pos = 
+    let ret = isl_aff_coefficient_sgn aff typ pos in
+    check_for_errors ctx;
+    ret
+
 let isl_aff_dim = foreign "isl_aff_dim" (Types.aff @-> dim_type @-> returning int)
 let dim ctx aff typ = 
     let ret = isl_aff_dim aff typ in
     check_for_errors ctx;
     ret
 
-let isl_aff_involves_dims = foreign "isl_aff_involves_dims" (Types.aff @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning int)
-let involves_dims ctx aff typ first n = 
-    let ret = isl_aff_involves_dims aff typ first n in
+let isl_aff_find_dim_by_name = foreign "isl_aff_find_dim_by_name" (Types.aff @-> dim_type @-> string @-> returning int)
+let find_dim_by_name ctx aff typ name = 
+    let ret = isl_aff_find_dim_by_name aff typ name in
     check_for_errors ctx;
     ret
 
@@ -26,30 +32,6 @@ let dump ctx aff =
 let isl_aff_get_dim_name = foreign "isl_aff_get_dim_name" (Types.aff @-> dim_type @-> unsigned_int @-> returning string)
 let get_dim_name ctx aff typ pos = 
     let ret = isl_aff_get_dim_name aff typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_aff_is_cst = foreign "isl_aff_is_cst" (Types.aff @-> returning bool)
-let is_cst ctx aff = 
-    let ret = isl_aff_is_cst aff in
-    check_for_errors ctx;
-    ret
-
-let isl_aff_is_nan = foreign "isl_aff_is_nan" (Types.aff @-> returning bool)
-let is_nan ctx aff = 
-    let ret = isl_aff_is_nan aff in
-    check_for_errors ctx;
-    ret
-
-let isl_aff_plain_is_equal = foreign "isl_aff_plain_is_equal" (Types.aff @-> Types.aff @-> returning bool)
-let plain_is_equal ctx aff1 aff2 = 
-    let ret = isl_aff_plain_is_equal aff1 aff2 in
-    check_for_errors ctx;
-    ret
-
-let isl_aff_plain_is_zero = foreign "isl_aff_plain_is_zero" (Types.aff @-> returning bool)
-let plain_is_zero ctx aff = 
-    let ret = isl_aff_plain_is_zero aff in
     check_for_errors ctx;
     ret
 
@@ -67,6 +49,15 @@ let get_space ctx aff =
     Gc.finalise space_free ret;
     ret
 
+let isl_aff_eq_basic_set = foreign "isl_aff_eq_basic_set" (Types.aff @-> Types.aff @-> returning Types.basic_set)
+let eq_basic_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_eq_basic_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise basic_set_free ret;
+    ret
+
 let isl_aff_ge_basic_set = foreign "isl_aff_ge_basic_set" (Types.aff @-> Types.aff @-> returning Types.basic_set)
 let ge_basic_set ctx aff1 aff2 = 
     let aff1 = aff_copy aff1 in
@@ -76,11 +67,29 @@ let ge_basic_set ctx aff1 aff2 =
     Gc.finalise basic_set_free ret;
     ret
 
+let isl_aff_gt_basic_set = foreign "isl_aff_gt_basic_set" (Types.aff @-> Types.aff @-> returning Types.basic_set)
+let gt_basic_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_gt_basic_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise basic_set_free ret;
+    ret
+
 let isl_aff_le_basic_set = foreign "isl_aff_le_basic_set" (Types.aff @-> Types.aff @-> returning Types.basic_set)
 let le_basic_set ctx aff1 aff2 = 
     let aff1 = aff_copy aff1 in
     let aff2 = aff_copy aff2 in
     let ret = isl_aff_le_basic_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise basic_set_free ret;
+    ret
+
+let isl_aff_lt_basic_set = foreign "isl_aff_lt_basic_set" (Types.aff @-> Types.aff @-> returning Types.basic_set)
+let lt_basic_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_lt_basic_set aff1 aff2 in
     check_for_errors ctx;
     Gc.finalise basic_set_free ret;
     ret
@@ -120,15 +129,6 @@ let get_denominator_val ctx aff =
     let ret = isl_aff_get_denominator_val aff in
     check_for_errors ctx;
     Gc.finalise val_free ret;
-    ret
-
-let isl_aff_add = foreign "isl_aff_add" (Types.aff @-> Types.aff @-> returning Types.aff)
-let add ctx aff1 aff2 = 
-    let aff1 = aff_copy aff1 in
-    let aff2 = aff_copy aff2 in
-    let ret = isl_aff_add aff1 aff2 in
-    check_for_errors ctx;
-    Gc.finalise aff_free ret;
     ret
 
 let isl_aff_add_coefficient_si = foreign "isl_aff_add_coefficient_si" (Types.aff @-> dim_type @-> int @-> int @-> returning Types.aff)
@@ -190,23 +190,6 @@ let align_params ctx aff model =
     Gc.finalise aff_free ret;
     ret
 
-let isl_aff_ceil = foreign "isl_aff_ceil" (Types.aff @-> returning Types.aff)
-let ceil ctx aff = 
-    let aff = aff_copy aff in
-    let ret = isl_aff_ceil aff in
-    check_for_errors ctx;
-    Gc.finalise aff_free ret;
-    ret
-
-let isl_aff_div = foreign "isl_aff_div" (Types.aff @-> Types.aff @-> returning Types.aff)
-let div ctx aff1 aff2 = 
-    let aff1 = aff_copy aff1 in
-    let aff2 = aff_copy aff2 in
-    let ret = isl_aff_div aff1 aff2 in
-    check_for_errors ctx;
-    Gc.finalise aff_free ret;
-    ret
-
 let isl_aff_drop_dims = foreign "isl_aff_drop_dims" (Types.aff @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.aff)
 let drop_dims ctx aff typ first n = 
     let aff = aff_copy aff in
@@ -215,10 +198,10 @@ let drop_dims ctx aff typ first n =
     Gc.finalise aff_free ret;
     ret
 
-let isl_aff_floor = foreign "isl_aff_floor" (Types.aff @-> returning Types.aff)
-let floor ctx aff = 
+let isl_aff_from_range = foreign "isl_aff_from_range" (Types.aff @-> returning Types.aff)
+let from_range ctx aff = 
     let aff = aff_copy aff in
-    let ret = isl_aff_floor aff in
+    let ret = isl_aff_from_range aff in
     check_for_errors ctx;
     Gc.finalise aff_free ret;
     ret
@@ -272,15 +255,6 @@ let move_dims ctx aff dst_type dst_pos src_type src_pos n =
     Gc.finalise aff_free ret;
     ret
 
-let isl_aff_mul = foreign "isl_aff_mul" (Types.aff @-> Types.aff @-> returning Types.aff)
-let mul ctx aff1 aff2 = 
-    let aff1 = aff_copy aff1 in
-    let aff2 = aff_copy aff2 in
-    let ret = isl_aff_mul aff1 aff2 in
-    check_for_errors ctx;
-    Gc.finalise aff_free ret;
-    ret
-
 let isl_aff_nan_on_domain = foreign "isl_aff_nan_on_domain" (Types.local_space @-> returning Types.aff)
 let nan_on_domain ctx ls = 
     let ls = local_space_copy ls in
@@ -289,10 +263,11 @@ let nan_on_domain ctx ls =
     Gc.finalise aff_free ret;
     ret
 
-let isl_aff_neg = foreign "isl_aff_neg" (Types.aff @-> returning Types.aff)
-let neg ctx aff = 
-    let aff = aff_copy aff in
-    let ret = isl_aff_neg aff in
+let isl_aff_param_on_domain_space_id = foreign "isl_aff_param_on_domain_space_id" (Types.space @-> Types.id @-> returning Types.aff)
+let param_on_domain_space_id ctx space id = 
+    let space = space_copy space in
+    let id = id_copy id in
+    let ret = isl_aff_param_on_domain_space_id space id in
     check_for_errors ctx;
     Gc.finalise aff_free ret;
     ret
@@ -310,13 +285,6 @@ let pullback_aff ctx aff1 aff2 =
     let aff1 = aff_copy aff1 in
     let aff2 = aff_copy aff2 in
     let ret = isl_aff_pullback_aff aff1 aff2 in
-    check_for_errors ctx;
-    Gc.finalise aff_free ret;
-    ret
-
-let isl_aff_read_from_str = foreign "isl_aff_read_from_str" (Types.ctx @-> string @-> returning Types.aff)
-let of_string ctx str = 
-    let ret = isl_aff_read_from_str ctx str in
     check_for_errors ctx;
     Gc.finalise aff_free ret;
     ret
@@ -407,15 +375,6 @@ let set_tuple_id ctx aff typ id =
     Gc.finalise aff_free ret;
     ret
 
-let isl_aff_sub = foreign "isl_aff_sub" (Types.aff @-> Types.aff @-> returning Types.aff)
-let sub ctx aff1 aff2 = 
-    let aff1 = aff_copy aff1 in
-    let aff2 = aff_copy aff2 in
-    let ret = isl_aff_sub aff1 aff2 in
-    check_for_errors ctx;
-    Gc.finalise aff_free ret;
-    ret
-
 let isl_aff_val_on_domain = foreign "isl_aff_val_on_domain" (Types.local_space @-> Types.value @-> returning Types.aff)
 let val_on_domain ctx ls value = 
     let ls = local_space_copy ls in
@@ -440,6 +399,13 @@ let zero_on_domain ctx ls =
     Gc.finalise aff_free ret;
     ret
 
+let isl_aff_to_str = foreign "isl_aff_to_str" (Types.aff @-> returning string)
+let to_string ctx aff = 
+    let ret = isl_aff_to_str aff in
+    check_for_errors ctx;
+    Gc.finalise (fun _ -> ()) ret;
+    ret
+
 let isl_aff_get_domain_local_space = foreign "isl_aff_get_domain_local_space" (Types.aff @-> returning Types.local_space)
 let get_domain_local_space ctx aff = 
     let ret = isl_aff_get_domain_local_space aff in
@@ -452,5 +418,126 @@ let get_local_space ctx aff =
     let ret = isl_aff_get_local_space aff in
     check_for_errors ctx;
     Gc.finalise local_space_free ret;
+    ret
+
+let isl_aff_eq_set = foreign "isl_aff_eq_set" (Types.aff @-> Types.aff @-> returning Types.set)
+let eq_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_eq_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise set_free ret;
+    ret
+
+let isl_aff_ge_set = foreign "isl_aff_ge_set" (Types.aff @-> Types.aff @-> returning Types.set)
+let ge_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_ge_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise set_free ret;
+    ret
+
+let isl_aff_gt_set = foreign "isl_aff_gt_set" (Types.aff @-> Types.aff @-> returning Types.set)
+let gt_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_gt_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise set_free ret;
+    ret
+
+let isl_aff_le_set = foreign "isl_aff_le_set" (Types.aff @-> Types.aff @-> returning Types.set)
+let le_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_le_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise set_free ret;
+    ret
+
+let isl_aff_lt_set = foreign "isl_aff_lt_set" (Types.aff @-> Types.aff @-> returning Types.set)
+let lt_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_lt_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise set_free ret;
+    ret
+
+let isl_aff_ne_set = foreign "isl_aff_ne_set" (Types.aff @-> Types.aff @-> returning Types.set)
+let ne_set ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_ne_set aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise set_free ret;
+    ret
+
+let isl_aff_add = foreign "isl_aff_add" (Types.aff @-> Types.aff @-> returning Types.aff)
+let add ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_add aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_ceil = foreign "isl_aff_ceil" (Types.aff @-> returning Types.aff)
+let ceil ctx aff = 
+    let aff = aff_copy aff in
+    let ret = isl_aff_ceil aff in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_div = foreign "isl_aff_div" (Types.aff @-> Types.aff @-> returning Types.aff)
+let div ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_div aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_floor = foreign "isl_aff_floor" (Types.aff @-> returning Types.aff)
+let floor ctx aff = 
+    let aff = aff_copy aff in
+    let ret = isl_aff_floor aff in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_mul = foreign "isl_aff_mul" (Types.aff @-> Types.aff @-> returning Types.aff)
+let mul ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_mul aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_neg = foreign "isl_aff_neg" (Types.aff @-> returning Types.aff)
+let neg ctx aff = 
+    let aff = aff_copy aff in
+    let ret = isl_aff_neg aff in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_sub = foreign "isl_aff_sub" (Types.aff @-> Types.aff @-> returning Types.aff)
+let sub ctx aff1 aff2 = 
+    let aff1 = aff_copy aff1 in
+    let aff2 = aff_copy aff2 in
+    let ret = isl_aff_sub aff1 aff2 in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
+    ret
+
+let isl_aff_read_from_str = foreign "isl_aff_read_from_str" (Types.ctx @-> string @-> returning Types.aff)
+let of_string ctx str = 
+    let ret = isl_aff_read_from_str ctx str in
+    check_for_errors ctx;
+    Gc.finalise aff_free ret;
     ret
 

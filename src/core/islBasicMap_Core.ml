@@ -5,105 +5,21 @@ open IslMemory
 open IslErrors
 open Unsigned
 
-let isl_basic_map_involves_dims = foreign "isl_basic_map_involves_dims" (Types.basic_map @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning int)
-let involves_dims ctx bmap typ first n = 
-    let ret = isl_basic_map_involves_dims bmap typ first n in
+let isl_basic_map_find_dim_by_name = foreign "isl_basic_map_find_dim_by_name" (Types.basic_map @-> dim_type @-> string @-> returning int)
+let find_dim_by_name ctx bmap typ name = 
+    let ret = isl_basic_map_find_dim_by_name bmap typ name in
+    check_for_errors ctx;
+    ret
+
+let isl_basic_map_n_constraint = foreign "isl_basic_map_n_constraint" (Types.basic_map @-> returning int)
+let n_constraint ctx bmap = 
+    let ret = isl_basic_map_n_constraint bmap in
     check_for_errors ctx;
     ret
 
 let isl_basic_map_dim = foreign "isl_basic_map_dim" (Types.basic_map @-> dim_type @-> returning unsigned_int)
 let dim ctx bmap typ = 
     let ret = isl_basic_map_dim bmap typ in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_n_div = foreign "isl_basic_map_n_div" (Types.basic_map @-> returning unsigned_int)
-let n_div ctx bmap = 
-    let ret = isl_basic_map_n_div bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_n_in = foreign "isl_basic_map_n_in" (Types.basic_map @-> returning unsigned_int)
-let n_in ctx bmap = 
-    let ret = isl_basic_map_n_in bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_n_out = foreign "isl_basic_map_n_out" (Types.basic_map @-> returning unsigned_int)
-let n_out ctx bmap = 
-    let ret = isl_basic_map_n_out bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_n_param = foreign "isl_basic_map_n_param" (Types.basic_map @-> returning unsigned_int)
-let n_param ctx bmap = 
-    let ret = isl_basic_map_n_param bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_total_dim = foreign "isl_basic_map_total_dim" (Types.basic_map @-> returning unsigned_int)
-let total_dim ctx bmap = 
-    let ret = isl_basic_map_total_dim bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_alloc = foreign "isl_basic_map_alloc" (Types.ctx @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> returning Types.basic_map)
-let alloc ctx nparam in_ out extra n_eq n_ineq = 
-    let ret = isl_basic_map_alloc ctx nparam in_ out extra n_eq n_ineq in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_empty_like = foreign "isl_basic_map_empty_like" (Types.basic_map @-> returning Types.basic_map)
-let empty_like ctx model = 
-    let ret = isl_basic_map_empty_like model in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_empty_like_map = foreign "isl_basic_map_empty_like_map" (Types.map @-> returning Types.basic_map)
-let empty_like_map ctx model = 
-    let ret = isl_basic_map_empty_like_map model in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_extend = foreign "isl_basic_map_extend" (Types.basic_map @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> unsigned_int @-> returning Types.basic_map)
-let extend ctx base nparam n_in n_out extra n_eq n_ineq = 
-    let ret = isl_basic_map_extend base nparam n_in n_out extra n_eq n_ineq in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_extend_constraints = foreign "isl_basic_map_extend_constraints" (Types.basic_map @-> unsigned_int @-> unsigned_int @-> returning Types.basic_map)
-let extend_constraints ctx base n_eq n_ineq = 
-    let ret = isl_basic_map_extend_constraints base n_eq n_ineq in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_finalize = foreign "isl_basic_map_finalize" (Types.basic_map @-> returning Types.basic_map)
-let finalize ctx bmap = 
-    let ret = isl_basic_map_finalize bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_identity_like = foreign "isl_basic_map_identity_like" (Types.basic_map @-> returning Types.basic_map)
-let identity_like ctx model = 
-    let ret = isl_basic_map_identity_like model in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_neg = foreign "isl_basic_map_neg" (Types.basic_map @-> returning Types.basic_map)
-let neg ctx bmap = 
-    let ret = isl_basic_map_neg bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_simplify = foreign "isl_basic_map_simplify" (Types.basic_map @-> returning Types.basic_map)
-let simplify ctx bmap = 
-    let ret = isl_basic_map_simplify bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_sum = foreign "isl_basic_map_sum" (Types.basic_map @-> Types.basic_map @-> returning Types.basic_map)
-let sum ctx bmap1 bmap2 = 
-    let ret = isl_basic_map_sum bmap1 bmap2 in
     check_for_errors ctx;
     ret
 
@@ -125,78 +41,6 @@ let get_tuple_name ctx bmap typ =
     check_for_errors ctx;
     ret
 
-let isl_basic_map_can_curry = foreign "isl_basic_map_can_curry" (Types.basic_map @-> returning bool)
-let can_curry ctx bmap = 
-    let ret = isl_basic_map_can_curry bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_can_uncurry = foreign "isl_basic_map_can_uncurry" (Types.basic_map @-> returning bool)
-let can_uncurry ctx bmap = 
-    let ret = isl_basic_map_can_uncurry bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_can_zip = foreign "isl_basic_map_can_zip" (Types.basic_map @-> returning bool)
-let can_zip ctx bmap = 
-    let ret = isl_basic_map_can_zip bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_fast_is_empty = foreign "isl_basic_map_fast_is_empty" (Types.basic_map @-> returning bool)
-let fast_is_empty ctx bmap = 
-    let ret = isl_basic_map_fast_is_empty bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_has_dim_id = foreign "isl_basic_map_has_dim_id" (Types.basic_map @-> dim_type @-> unsigned_int @-> returning bool)
-let has_dim_id ctx bmap typ pos = 
-    let ret = isl_basic_map_has_dim_id bmap typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_image_is_bounded = foreign "isl_basic_map_image_is_bounded" (Types.basic_map @-> returning bool)
-let image_is_bounded ctx bmap = 
-    let ret = isl_basic_map_image_is_bounded bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_disjoint = foreign "isl_basic_map_is_disjoint" (Types.basic_map @-> Types.basic_map @-> returning bool)
-let is_disjoint ctx bmap1 bmap2 = 
-    let ret = isl_basic_map_is_disjoint bmap1 bmap2 in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_rational = foreign "isl_basic_map_is_rational" (Types.basic_map @-> returning bool)
-let is_rational ctx bmap = 
-    let ret = isl_basic_map_is_rational bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_single_valued = foreign "isl_basic_map_is_single_valued" (Types.basic_map @-> returning bool)
-let is_single_valued ctx bmap = 
-    let ret = isl_basic_map_is_single_valued bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_strict_subset = foreign "isl_basic_map_is_strict_subset" (Types.basic_map @-> Types.basic_map @-> returning bool)
-let is_strict_subset ctx bmap1 bmap2 = 
-    let ret = isl_basic_map_is_strict_subset bmap1 bmap2 in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_universe = foreign "isl_basic_map_is_universe" (Types.basic_map @-> returning bool)
-let is_universe ctx bmap = 
-    let ret = isl_basic_map_is_universe bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_plain_is_empty = foreign "isl_basic_map_plain_is_empty" (Types.basic_map @-> returning bool)
-let plain_is_empty ctx bmap = 
-    let ret = isl_basic_map_plain_is_empty bmap in
-    check_for_errors ctx;
-    ret
-
 let isl_basic_map_get_space = foreign "isl_basic_map_get_space" (Types.basic_map @-> returning Types.space)
 let get_space ctx bmap = 
     let ret = isl_basic_map_get_space bmap in
@@ -212,18 +56,18 @@ let compute_divs ctx bmap =
     Gc.finalise map_free ret;
     ret
 
-let isl_basic_map_add = foreign "isl_basic_map_add" (Types.basic_map @-> dim_type @-> unsigned_int @-> returning Types.basic_map)
-let add ctx bmap typ n = 
-    let bmap = basic_map_copy bmap in
-    let ret = isl_basic_map_add bmap typ n in
-    check_for_errors ctx;
-    Gc.finalise basic_map_free ret;
-    ret
-
 let isl_basic_map_add_constraint = foreign "isl_basic_map_add_constraint" (Types.basic_map @-> Types.constrnt @-> returning Types.basic_map)
 let add_constraint ctx bmap constrnt = 
     let bmap = basic_map_copy bmap in
     let ret = isl_basic_map_add_constraint bmap constrnt in
+    check_for_errors ctx;
+    Gc.finalise basic_map_free ret;
+    ret
+
+let isl_basic_map_add_dims = foreign "isl_basic_map_add_dims" (Types.basic_map @-> dim_type @-> unsigned_int @-> returning Types.basic_map)
+let add_dims ctx bmap typ n = 
+    let bmap = basic_map_copy bmap in
+    let ret = isl_basic_map_add_dims bmap typ n in
     check_for_errors ctx;
     Gc.finalise basic_map_free ret;
     ret
@@ -278,6 +122,22 @@ let drop_constraints_involving_dims ctx bmap typ first n =
     Gc.finalise basic_map_free ret;
     ret
 
+let isl_basic_map_drop_constraints_not_involving_dims = foreign "isl_basic_map_drop_constraints_not_involving_dims" (Types.basic_map @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.basic_map)
+let drop_constraints_not_involving_dims ctx bmap typ first n = 
+    let bmap = basic_map_copy bmap in
+    let ret = isl_basic_map_drop_constraints_not_involving_dims bmap typ first n in
+    check_for_errors ctx;
+    Gc.finalise basic_map_free ret;
+    ret
+
+let isl_basic_map_drop_unused_params = foreign "isl_basic_map_drop_unused_params" (Types.basic_map @-> returning Types.basic_map)
+let drop_unused_params ctx bmap = 
+    let bmap = basic_map_copy bmap in
+    let ret = isl_basic_map_drop_unused_params bmap in
+    check_for_errors ctx;
+    Gc.finalise basic_map_free ret;
+    ret
+
 let isl_basic_map_eliminate = foreign "isl_basic_map_eliminate" (Types.basic_map @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning Types.basic_map)
 let eliminate ctx bmap typ first n = 
     let bmap = basic_map_copy bmap in
@@ -287,9 +147,9 @@ let eliminate ctx bmap typ first n =
     ret
 
 let isl_basic_map_empty = foreign "isl_basic_map_empty" (Types.space @-> returning Types.basic_map)
-let empty ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_basic_map_empty dim in
+let empty ctx space = 
+    let space = space_copy space in
+    let ret = isl_basic_map_empty space in
     check_for_errors ctx;
     Gc.finalise basic_map_free ret;
     ret
@@ -353,15 +213,6 @@ let from_aff ctx aff =
     Gc.finalise basic_map_free ret;
     ret
 
-let isl_basic_map_from_basic_set = foreign "isl_basic_map_from_basic_set" (Types.basic_set @-> Types.space @-> returning Types.basic_map)
-let from_basic_set ctx bset dim = 
-    let bset = basic_set_copy bset in
-    let dim = space_copy dim in
-    let ret = isl_basic_map_from_basic_set bset dim in
-    check_for_errors ctx;
-    Gc.finalise basic_map_free ret;
-    ret
-
 let isl_basic_map_from_constraint = foreign "isl_basic_map_from_constraint" (Types.constrnt @-> returning Types.basic_map)
 let from_constraint ctx constrnt = 
     let ret = isl_basic_map_from_constraint constrnt in
@@ -390,6 +241,15 @@ let isl_basic_map_from_range = foreign "isl_basic_map_from_range" (Types.basic_s
 let from_range ctx bset = 
     let bset = basic_set_copy bset in
     let ret = isl_basic_map_from_range bset in
+    check_for_errors ctx;
+    Gc.finalise basic_map_free ret;
+    ret
+
+let isl_basic_map_gist_domain = foreign "isl_basic_map_gist_domain" (Types.basic_map @-> Types.basic_set @-> returning Types.basic_map)
+let gist_domain ctx bmap context = 
+    let bmap = basic_map_copy bmap in
+    let context = basic_set_copy context in
+    let ret = isl_basic_map_gist_domain bmap context in
     check_for_errors ctx;
     Gc.finalise basic_map_free ret;
     ret
@@ -446,6 +306,14 @@ let isl_basic_map_nat_universe = foreign "isl_basic_map_nat_universe" (Types.spa
 let nat_universe ctx dim = 
     let dim = space_copy dim in
     let ret = isl_basic_map_nat_universe dim in
+    check_for_errors ctx;
+    Gc.finalise basic_map_free ret;
+    ret
+
+let isl_basic_map_neg = foreign "isl_basic_map_neg" (Types.basic_map @-> returning Types.basic_map)
+let neg ctx bmap = 
+    let bmap = basic_map_copy bmap in
+    let ret = isl_basic_map_neg bmap in
     check_for_errors ctx;
     Gc.finalise basic_map_free ret;
     ret
@@ -557,6 +425,15 @@ let set_tuple_name ctx bmap typ s =
     Gc.finalise basic_map_free ret;
     ret
 
+let isl_basic_map_sum = foreign "isl_basic_map_sum" (Types.basic_map @-> Types.basic_map @-> returning Types.basic_map)
+let sum ctx bmap1 bmap2 = 
+    let bmap1 = basic_map_copy bmap1 in
+    let bmap2 = basic_map_copy bmap2 in
+    let ret = isl_basic_map_sum bmap1 bmap2 in
+    check_for_errors ctx;
+    Gc.finalise basic_map_free ret;
+    ret
+
 let isl_basic_map_uncurry = foreign "isl_basic_map_uncurry" (Types.basic_map @-> returning Types.basic_map)
 let uncurry ctx bmap = 
     let bmap = basic_map_copy bmap in
@@ -566,16 +443,9 @@ let uncurry ctx bmap =
     ret
 
 let isl_basic_map_universe = foreign "isl_basic_map_universe" (Types.space @-> returning Types.basic_map)
-let universe ctx dim = 
-    let dim = space_copy dim in
-    let ret = isl_basic_map_universe dim in
-    check_for_errors ctx;
-    Gc.finalise basic_map_free ret;
-    ret
-
-let isl_basic_map_universe_like = foreign "isl_basic_map_universe_like" (Types.basic_map @-> returning Types.basic_map)
-let universe_like ctx bmap = 
-    let ret = isl_basic_map_universe_like bmap in
+let universe ctx space = 
+    let space = space_copy space in
+    let ret = isl_basic_map_universe space in
     check_for_errors ctx;
     Gc.finalise basic_map_free ret;
     ret
@@ -634,29 +504,18 @@ let get_div ctx bmap pos =
     Gc.finalise aff_free ret;
     ret
 
+let isl_basic_map_to_str = foreign "isl_basic_map_to_str" (Types.basic_map @-> returning string)
+let to_string ctx bmap = 
+    let ret = isl_basic_map_to_str bmap in
+    check_for_errors ctx;
+    Gc.finalise (fun _ -> ()) ret;
+    ret
+
 let isl_basic_map_get_local_space = foreign "isl_basic_map_get_local_space" (Types.basic_map @-> returning Types.local_space)
 let get_local_space ctx bmap = 
     let ret = isl_basic_map_get_local_space bmap in
     check_for_errors ctx;
     Gc.finalise local_space_free ret;
-    ret
-
-let isl_basic_map_is_empty = foreign "isl_basic_map_is_empty" (Types.basic_map @-> returning bool)
-let is_empty ctx bmap = 
-    let ret = isl_basic_map_is_empty bmap in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_equal = foreign "isl_basic_map_is_equal" (Types.basic_map @-> Types.basic_map @-> returning bool)
-let is_equal ctx bmap1 bmap2 = 
-    let ret = isl_basic_map_is_equal bmap1 bmap2 in
-    check_for_errors ctx;
-    ret
-
-let isl_basic_map_is_subset = foreign "isl_basic_map_is_subset" (Types.basic_map @-> Types.basic_map @-> returning bool)
-let is_subset ctx bmap1 bmap2 = 
-    let ret = isl_basic_map_is_subset bmap1 bmap2 in
-    check_for_errors ctx;
     ret
 
 let isl_basic_map_lexmax = foreign "isl_basic_map_lexmax" (Types.basic_map @-> returning Types.map)

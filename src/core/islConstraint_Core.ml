@@ -5,15 +5,21 @@ open IslMemory
 open IslErrors
 open Unsigned
 
+let isl_constraint_cmp_last_non_zero = foreign "isl_constraint_cmp_last_non_zero" (Types.constrnt @-> Types.constrnt @-> returning int)
+let cmp_last_non_zero ctx c1 c2 = 
+    let ret = isl_constraint_cmp_last_non_zero c1 c2 in
+    check_for_errors ctx;
+    ret
+
 let isl_constraint_dim = foreign "isl_constraint_dim" (Types.constrnt @-> dim_type @-> returning int)
 let dim ctx constrnt typ = 
     let ret = isl_constraint_dim constrnt typ in
     check_for_errors ctx;
     ret
 
-let isl_constraint_involves_dims = foreign "isl_constraint_involves_dims" (Types.constrnt @-> dim_type @-> unsigned_int @-> unsigned_int @-> returning int)
-let involves_dims ctx constrnt typ first n = 
-    let ret = isl_constraint_involves_dims constrnt typ first n in
+let isl_constraint_plain_cmp = foreign "isl_constraint_plain_cmp" (Types.constrnt @-> Types.constrnt @-> returning int)
+let plain_cmp ctx c1 c2 = 
+    let ret = isl_constraint_plain_cmp c1 c2 in
     check_for_errors ctx;
     ret
 
@@ -26,12 +32,6 @@ let dump ctx c =
 let isl_constraint_get_dim_name = foreign "isl_constraint_get_dim_name" (Types.constrnt @-> dim_type @-> unsigned_int @-> returning string)
 let get_dim_name ctx constrnt typ pos = 
     let ret = isl_constraint_get_dim_name constrnt typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_constraint_cow = foreign "isl_constraint_cow" (Types.constrnt @-> returning Types.constrnt)
-let cow ctx c = 
-    let ret = isl_constraint_cow c in
     check_for_errors ctx;
     ret
 
@@ -50,24 +50,6 @@ let is_div_constraint ctx constrnt =
 let isl_constraint_is_equal = foreign "isl_constraint_is_equal" (Types.constrnt @-> Types.constrnt @-> returning bool)
 let is_equal ctx constraint1 constraint2 = 
     let ret = isl_constraint_is_equal constraint1 constraint2 in
-    check_for_errors ctx;
-    ret
-
-let isl_constraint_is_equality = foreign "isl_constraint_is_equality" (Types.constrnt @-> returning bool)
-let is_equality ctx constrnt = 
-    let ret = isl_constraint_is_equality constrnt in
-    check_for_errors ctx;
-    ret
-
-let isl_constraint_is_lower_bound = foreign "isl_constraint_is_lower_bound" (Types.constrnt @-> dim_type @-> unsigned_int @-> returning bool)
-let is_lower_bound ctx constrnt typ pos = 
-    let ret = isl_constraint_is_lower_bound constrnt typ pos in
-    check_for_errors ctx;
-    ret
-
-let isl_constraint_is_upper_bound = foreign "isl_constraint_is_upper_bound" (Types.constrnt @-> dim_type @-> unsigned_int @-> returning bool)
-let is_upper_bound ctx constrnt typ pos = 
-    let ret = isl_constraint_is_upper_bound constrnt typ pos in
     check_for_errors ctx;
     ret
 
@@ -118,6 +100,22 @@ let get_local_space ctx constrnt =
     let ret = isl_constraint_get_local_space constrnt in
     check_for_errors ctx;
     Gc.finalise local_space_free ret;
+    ret
+
+let isl_constraint_alloc_equality = foreign "isl_constraint_alloc_equality" (Types.local_space @-> returning Types.constrnt)
+let alloc_equality ctx ls = 
+    let ls = local_space_copy ls in
+    let ret = isl_constraint_alloc_equality ls in
+    check_for_errors ctx;
+    Gc.finalise constraint_free ret;
+    ret
+
+let isl_constraint_alloc_inequality = foreign "isl_constraint_alloc_inequality" (Types.local_space @-> returning Types.constrnt)
+let alloc_inequality ctx ls = 
+    let ls = local_space_copy ls in
+    let ret = isl_constraint_alloc_inequality ls in
+    check_for_errors ctx;
+    Gc.finalise constraint_free ret;
     ret
 
 let isl_constraint_set_coefficient_si = foreign "isl_constraint_set_coefficient_si" (Types.constrnt @-> dim_type @-> int @-> int @-> returning Types.constrnt)
