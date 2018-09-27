@@ -12,7 +12,7 @@ Library "isl_core"
   BuildDepends:	ctypes, ctypes.foreign
   FindlibParent: isl
   FindlibName:	core
-  Modules:	IslMemory, IslErrors, Types, IslCtx, IslAff_Core, IslBasicMap_Core, IslBasicSet_Core, IslConstraint_Core, IslId_Core, IslLocalSpace_Core, IslMap_Core, IslSet_Core, IslUnionMap_Core, IslUnionSet_Core, IslValue_Core
+  Modules:	IslMemory, IslErrors, Types, IslCtx, IslAff_Core, IslBasicMap_Core, IslBasicSet_Core, IslConstraint_Core, IslId_Core, IslLocalSpace_Core, IslMap_Core, IslSet_Core, IslUnionMap_Core, IslUnionSet_Core, IslValue_Core, IslSpace_Core
 
 Library "isl"
   Path:            src/
